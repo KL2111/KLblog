@@ -7,19 +7,19 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 config_path = os.path.join(script_dir, 'git_auto_config.json')
 
 def load_config():
-    """ 加载已保存的配置文件 """
+    """加载已保存的配置文件"""
     if os.path.exists(config_path):
         with open(config_path, 'r', encoding='utf-8') as f:
             return json.load(f)
     return None
 
 def save_config(config):
-    """ 保存配置到文件 """
+    """保存配置到文件"""
     with open(config_path, 'w', encoding='utf-8') as f:
         json.dump(config, f, ensure_ascii=False)
 
 def choose_directory():
-    """ 选择Git仓库目录 """
+    """选择Git仓库目录"""
     current_path = os.path.dirname(os.path.realpath(__file__))
     options = [
         current_path,
@@ -41,7 +41,7 @@ def choose_directory():
         return choose_directory()
 
 def setup_remote_repo():
-    """ 设置远程仓库地址 """
+    """设置远程仓库地址"""
     remote_url = input("请输入SSH格式的远程仓库地址: ")
     if remote_url.startswith("git@"):
         return remote_url
@@ -50,32 +50,32 @@ def setup_remote_repo():
         return setup_remote_repo()
 
 def verify_ssh():
-    """ 验证SSH公钥登录 """
+    """验证SSH公钥登录"""
     result = subprocess.run("ssh -T git@github.com", shell=True, text=True, capture_output=True)
     if "successfully authenticated" not in result.stderr:
         print("SSH公钥验证失败，请确保你的公钥已经添加到远程仓库。")
         exit(0)
 
 def update_remote_repo(repo_dir, remote_url):
-    """ 更新远程仓库地址 """
+    """更新远程仓库地址"""
     os.chdir(repo_dir)
     print(f"Updating remote repository URL to {remote_url}")
     subprocess.run("git remote remove origin", shell=True, capture_output=True, text=True)
     subprocess.run(f"git remote add origin {remote_url}", shell=True, capture_output=True, text=True)
 
 def commit_local_changes():
-    """ 提交本地更改 """
+    """提交本地更改"""
     subprocess.run("git add -A", shell=True)
     commit_message = f"Local changes on {datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
     subprocess.run(f"git commit -m '{commit_message}'", shell=True, capture_output=True, text=True)
 
 def check_local_changes():
-    """ 检查本地是否有未提交的更改 """
+    """检查本地是否有未提交的更改"""
     status_result = subprocess.run("git status --porcelain", shell=True, capture_output=True, text=True)
     return status_result.stdout.strip() != ""
 
 def ensure_git_repo(repo_dir):
-    """ 确保当前目录是一个 Git 仓库 """
+    """确保当前目录是一个 Git 仓库"""
     os.chdir(repo_dir)
     if not os.path.exists(os.path.join(repo_dir, '.git')):
         print("当前目录不是一个 Git 仓库，正在初始化...")
@@ -88,26 +88,26 @@ def ensure_git_repo(repo_dir):
         print("当前目录已经是一个 Git 仓库。")
 
 def force_remote_overwrite():
-    """ 强制远程覆盖本地 """
+    """强制远程覆盖本地"""
     subprocess.run("git fetch origin", shell=True)
     subprocess.run("git reset --hard origin/master", shell=True)
     print("远程仓库已覆盖本地仓库。")
 
 def force_local_overwrite():
-    """ 强制本地覆盖远程 """
-    subprocess.run("git add -A", shell=True)
-    commit_message = f"Force overwrite on {datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    subprocess.run(f"git commit -m '{commit_message}'", shell=True)
+    """强制本地覆盖远程"""
+    if check_local_changes():
+        commit_local_changes()
     subprocess.run("git push origin master --force", shell=True)
     print("本地仓库已覆盖远程仓库。")
 
 def merge_and_push(repo_dir):
-    """ 合并并推送 """
+    """合并并推送"""
     os.chdir(repo_dir)
     print(f"Pulling latest changes from origin")
     pull_result = subprocess.run("git pull --rebase origin master", shell=True, text=True, capture_output=True)
     if pull_result.returncode != 0:
         print(f"拉取失败，错误信息: {pull_result.stderr}")
+        handle_merge_conflict()
         return
     # 获取用户的commit信息或使用默认日期作为commit信息
     commit_message = input("请输入commit信息（日期信息已默认输入）: ")
@@ -127,21 +127,33 @@ def merge_and_push(repo_dir):
     push_result = subprocess.run("git push origin master", shell=True, text=True, capture_output=True)
     if push_result.returncode != 0:
         print(f"推送失败，错误信息: {push_result.stderr}")
-        strategy = input("请选择冲突解决策略：1. 强制远程覆盖本地 2. 强制本地覆盖远程 3. 手动解决冲突 (1/2/3): ")
-        if strategy == '1':
-            force_remote_overwrite()
-        elif strategy == '2':
-            force_local_overwrite()
-        elif strategy == '3':
-            print("请手动解决所有冲突并继续操作。")
-            print("解决所有冲突后，运行以下命令完成rebase并推送：")
-            print("git add <conflicted_files>")
-            print("git rebase --continue")
-            print("git push origin master")
-        else:
-            print("无效选择，退出程序。")
+        handle_merge_conflict()
     else:
         print("Git操作完成。")
+
+def handle_merge_conflict():
+    """处理合并冲突"""
+    strategy = input("合并冲突，请选择冲突解决策略：1. 强制远程覆盖本地 2. 强制本地覆盖远程 3. 手动解决冲突 (1/2/3): ")
+    if strategy == '1':
+        confirmation = input("确定要强制远程覆盖本地吗？这将丢失本地所有未推送的更改 (Y/N): ").upper()
+        if confirmation == 'Y':
+            force_remote_overwrite()
+        else:
+            print("操作已取消。")
+    elif strategy == '2':
+        confirmation = input("确定要强制本地覆盖远程吗？这将丢失远程仓库中的所有更改 (Y/N): ").upper()
+        if confirmation == 'Y':
+            force_local_overwrite()
+        else:
+            print("操作已取消。")
+    elif strategy == '3':
+        print("请手动解决所有冲突并继续操作。")
+        print("解决所有冲突后，运行以下命令完成rebase并推送：")
+        print("git add <conflicted_files>")
+        print("git rebase --continue")
+        print("git push origin master")
+    else:
+        print("无效选择，退出程序。")
 
 def main():
     config = load_config()
@@ -166,23 +178,7 @@ def main():
     if check_local_changes():
         commit_local_changes()
 
-    strategy = input("请选择操作策略：1. 强制远程覆盖本地 2. 强制本地覆盖远程 3. 合并提交并推送 (1/2/3): ")
-    if strategy == '1':
-        confirmation = input("确定要强制远程覆盖本地吗？这将丢失本地所有未推送的更改 (Y/N): ").upper()
-        if confirmation == 'Y':
-            force_remote_overwrite()
-        else:
-            print("操作已取消。")
-    elif strategy == '2':
-        confirmation = input("确定要强制本地覆盖远程吗？这将丢失远程仓库中的所有更改 (Y/N): ").upper()
-        if confirmation == 'Y':
-            force_local_overwrite()
-        else:
-            print("操作已取消。")
-    elif strategy == '3':
-        merge_and_push(repo_dir)
-    else:
-        print("无效选择，退出程序。")
+    merge_and_push(repo_dir)
 
 if __name__ == "__main__":
     main()
