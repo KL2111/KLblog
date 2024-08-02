@@ -109,20 +109,19 @@ def merge_and_push(repo_dir):
         print(f"拉取失败，错误信息: {pull_result.stderr}")
         handle_merge_conflict()
         return
-    # 获取用户的commit信息或使用默认日期作为commit信息
-    commit_message = input("请输入commit信息（日期信息已默认输入）: ")
-    if not commit_message:
-        commit_message = datetime.datetime.now().strftime("%Y%m%d")
-    else:
-        commit_message = datetime.datetime.now().strftime("%Y%m%d_") + commit_message
-    # 添加所有更改到staging area
-    subprocess.run("git add -A", shell=True)
-    # 执行commit，如果没有变化则不会创建新的commit
-    commit_result = subprocess.run(f"git commit -m '{commit_message}'", shell=True, text=True, capture_output=True)
-    if "nothing to commit" in commit_result.stdout or "nothing to commit" in commit_result.stderr:
-        print("没有发现需要提交的更改。")
-    else:
-        print("Committing changes")
+    
+    # 检查拉取后的变更并提交
+    if check_local_changes():
+        commit_message = input("请输入commit信息（日期信息已默认输入）: ")
+        if not commit_message:
+            commit_message = datetime.datetime.now().strftime("%Y%m%d")
+        else:
+            commit_message = datetime.datetime.now().strftime("%Y%m%d_") + commit_message
+        # 添加所有更改到staging area
+        subprocess.run("git add -A", shell=True)
+        # 执行commit
+        subprocess.run(f"git commit -m '{commit_message}'", shell=True, text=True, capture_output=True)
+    
     # 推送更改到远程仓库
     push_result = subprocess.run("git push origin master", shell=True, text=True, capture_output=True)
     if push_result.returncode != 0:
