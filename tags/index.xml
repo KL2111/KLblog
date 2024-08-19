@@ -11,13 +11,20 @@
     </image>
     <generator>Hugo -- 0.129.0</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 05 Jun 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 15 Aug 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://www.kailiang.life/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>人生读者</title>
-      <link>https://www.kailiang.life/tags/%E4%BA%BA%E7%94%9F%E8%AF%BB%E8%80%85/</link>
-      <pubDate>Wed, 05 Jun 2024 00:00:00 +0000</pubDate>
-      <guid>https://www.kailiang.life/tags/%E4%BA%BA%E7%94%9F%E8%AF%BB%E8%80%85/</guid>
+      <title>Essay</title>
+      <link>https://www.kailiang.life/tags/essay/</link>
+      <pubDate>Thu, 15 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://www.kailiang.life/tags/essay/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>#Essay</title>
+      <link>https://www.kailiang.life/tags/%23essay/</link>
+      <pubDate>Wed, 17 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>https://www.kailiang.life/tags/%23essay/</guid>
       <description></description>
     </item>
   </channel>
