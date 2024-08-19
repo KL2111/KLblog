@@ -18,6 +18,10 @@ def save_config(config):
     with open(config_path, 'w', encoding='utf-8') as f:
         json.dump(config, f, ensure_ascii=False)
 
+def is_git_repository(repo_dir):
+    """检查当前目录是否是一个Git仓库"""
+    return os.path.exists(os.path.join(repo_dir, '.git'))
+
 def choose_directory():
     """选择Git仓库目录"""
     current_path = os.path.dirname(os.path.realpath(__file__))
@@ -77,7 +81,7 @@ def check_local_changes():
 def ensure_git_repo(repo_dir):
     """确保当前目录是一个 Git 仓库"""
     os.chdir(repo_dir)
-    if not os.path.exists(os.path.join(repo_dir, '.git')):
+    if not is_git_repository(repo_dir):
         print("当前目录不是一个 Git 仓库，正在初始化...")
         subprocess.run("git init", shell=True)
         subprocess.run("touch README.md", shell=True)
@@ -164,25 +168,48 @@ def clean_git_lock(repo_dir):
 
 def check_for_git_processes():
     """检查是否有其他Git进程在运行"""
-    result = subprocess.run("ps aux | grep '[g]it'", shell=True, capture_output=True, text=True)
+    result = subprocess.run("ps aux | grep '[g]it ' | grep -v 'Clash Verge' | grep -v 'WeChat' | grep -v 'Python'", shell=True, capture_output=True, text=True)
     if result.stdout.strip():
-        print("Detected another Git process running. Please wait for it to complete or terminate it before proceeding.")
-        exit(0)
+        print("Detected the following Git-related processes:")
+        print(result.stdout)
+        choice = input("These processes were detected. Do you want to ignore and continue? (Y/N): ").upper()
+        if choice == 'Y':
+            print("Continuing script execution...")
+        else:
+            print("Please terminate these processes before proceeding.")
+            exit(0)
 
 def handle_unfinished_rebase(repo_dir):
     """处理未完成的rebase操作"""
+    if not is_git_repository(repo_dir):
+        print("当前目录不是一个Git仓库，无法处理rebase操作。")
+        exit(1)
+    
+    os.chdir(repo_dir)  # 切换到Git仓库目录
+    print(f"当前目录: {os.getcwd()}")  # 打印当前目录，确保切换成功
+    
     rebase_dir = os.path.join(repo_dir, '.git', 'rebase-merge')
     if os.path.exists(rebase_dir):
-        user_choice = input("检测到未完成的rebase操作，是否中止操作？ (Y/N): ").upper()
+        user_choice = input("检测到未完成的rebase操作。是否尝试继续？(Y) 还是中止？(N): ").upper()
         if user_choice == 'Y':
+            subprocess.run("git rebase --continue", shell=True)
+            print("尝试继续rebase操作。")
+            if os.path.exists(rebase_dir):
+                print("rebase未完成，可能需要手动解决冲突。")
+                exit(1)
+            else:
+                print("rebase操作已成功完成。")
+        else:
             subprocess.run("git rebase --abort", shell=True)
             print("未完成的rebase操作已中止。")
-        else:
-            print("请手动完成rebase操作后再运行此脚本。")
-            exit(1)
+
 
 def stash_local_changes():
     """暂存本地更改"""
+    if not is_git_repository(os.getcwd()):
+        print("当前目录不是一个Git仓库，无法暂存更改。")
+        exit(1)
+
     subprocess.run("git stash", shell=True)
     print("Stashed local changes.")
 
@@ -204,7 +231,7 @@ def main():
 
     verify_ssh()
     clean_git_lock(repo_dir)
-    # check_for_git_processes()  # 如果确认没有其他 Git 进程，可以暂时注释掉这行
+    check_for_git_processes()
     handle_unfinished_rebase(repo_dir)
     stash_local_changes()
     ensure_git_repo(repo_dir)
