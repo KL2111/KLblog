@@ -8,18 +8,25 @@ config_path = os.path.join(script_dir, 'git_auto_config.json')
 
 def load_config():
     """加载已保存的配置文件"""
+    print("正在加载配置文件...")
     if os.path.exists(config_path):
         with open(config_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            config = json.load(f)
+            print("配置文件加载成功：", config)
+            return config
+    print("未找到配置文件，将创建新的配置。")
     return None
 
 def save_config(config):
     """保存配置到文件"""
+    print("正在保存配置到文件...")
     with open(config_path, 'w', encoding='utf-8') as f:
         json.dump(config, f, ensure_ascii=False)
+    print("配置保存完成。")
 
 def choose_directory():
     """选择Git仓库目录"""
+    print("选择Git仓库目录...")
     current_path = os.path.dirname(os.path.realpath(__file__))
     options = [
         current_path,
@@ -42,8 +49,10 @@ def choose_directory():
 
 def setup_remote_repo():
     """设置远程仓库地址"""
+    print("设置远程仓库地址...")
     remote_url = input("请输入SSH格式的远程仓库地址: ")
     if remote_url.startswith("git@"):
+        print("远程仓库地址设置为：", remote_url)
         return remote_url
     else:
         print("远程仓库地址格式错误，必须是SSH格式。")
@@ -51,31 +60,44 @@ def setup_remote_repo():
 
 def verify_ssh():
     """验证SSH公钥登录"""
+    print("验证SSH公钥登录...")
     result = subprocess.run("ssh -T git@github.com", shell=True, text=True, capture_output=True)
     if "successfully authenticated" not in result.stderr:
         print("SSH公钥验证失败，请确保你的公钥已经添加到远程仓库。")
         exit(0)
+    print("SSH公钥验证成功。")
 
 def update_remote_repo(repo_dir, remote_url):
     """更新远程仓库地址"""
+    print(f"正在更新远程仓库地址: {remote_url}")
     os.chdir(repo_dir)
-    print(f"Updating remote repository URL to {remote_url}")
     subprocess.run("git remote remove origin", shell=True, capture_output=True, text=True)
     subprocess.run(f"git remote add origin {remote_url}", shell=True, capture_output=True, text=True)
+    print("远程仓库地址更新完成。")
 
 def commit_local_changes():
     """提交本地更改"""
+    print("提交本地更改...")
     subprocess.run("git add -A", shell=True)
     commit_message = f"Local changes on {datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
     subprocess.run(f"git commit -m '{commit_message}'", shell=True, capture_output=True, text=True)
+    print("本地更改提交完成。")
 
 def check_local_changes():
     """检查本地是否有未提交的更改"""
-    status_result = subprocess.run("git status --porcelain", shell=True, capture_output=True, text=True)
-    return status_result.stdout.strip() != ""
+    print("检查本地更改...")
+    try:
+        status_result = subprocess.run("git status --porcelain", shell=True, capture_output=True, text=True, timeout=60)  # 设置超时为60秒
+        changes = status_result.stdout.strip() != ""
+        print("本地更改状态：", "有更改" if changes else "无更改")
+        return changes
+    except subprocess.TimeoutExpired:
+        print("执行 git status 命令超时，可能由于文件数量过多或磁盘响应慢")
+        return False  # 或处理为需要的方式，如重试或退出
 
 def ensure_git_repo(repo_dir):
     """确保当前目录是一个 Git 仓库"""
+    print("确保当前目录是一个 Git 仓库...")
     os.chdir(repo_dir)
     if not os.path.exists(os.path.join(repo_dir, '.git')):
         print("当前目录不是一个 Git 仓库，正在初始化...")
@@ -89,12 +111,14 @@ def ensure_git_repo(repo_dir):
 
 def force_remote_overwrite():
     """强制远程覆盖本地"""
+    print("强制远程覆盖本地...")
     subprocess.run("git fetch origin", shell=True)
     subprocess.run("git reset --hard origin/master", shell=True)
     print("远程仓库已覆盖本地仓库。")
 
 def force_local_overwrite():
     """强制本地覆盖远程"""
+    print("强制本地覆盖远程...")
     if check_local_changes():
         commit_local_changes()
     subprocess.run("git push origin master --force", shell=True)
@@ -102,52 +126,44 @@ def force_local_overwrite():
 
 def merge_and_push(repo_dir):
     """合并并推送"""
+    print("拉取并合并来自远程仓库的更改...")
     os.chdir(repo_dir)
-    print(f"Pulling latest changes from origin")
     pull_result = subprocess.run("git pull --rebase origin master", shell=True, text=True, capture_output=True)
     if pull_result.returncode != 0:
         print(f"拉取失败，错误信息: {pull_result.stderr}")
         handle_merge_conflict()
         return
-    # 获取用户的commit信息或使用默认日期作为commit信息
     commit_message = input("请输入commit信息（日期信息已默认输入）: ")
     if not commit_message:
         commit_message = datetime.datetime.now().strftime("%Y%m%d")
     else:
         commit_message = datetime.datetime.now().strftime("%Y%m%d_") + commit_message
-    # 添加所有更改到staging area
     subprocess.run("git add -A", shell=True)
-    # 执行commit，如果没有变化则不会创建新的commit
     commit_result = subprocess.run(f"git commit -m '{commit_message}'", shell=True, text=True, capture_output=True)
     if "nothing to commit" in commit_result.stdout or "nothing to commit" in commit_result.stderr:
         print("没有发现需要提交的更改。")
     else:
         print("Committing changes")
-    # 推送更改到远程仓库
     push_result = subprocess.run("git push origin master", shell=True, text=True, capture_output=True)
     if push_result.returncode != 0:
         print(f"推送失败，错误信息: {push_result.stderr}")
         handle_merge_conflict()
     else:
-        print("Git操作完成。")
+        print("更改已成功推送到远程仓库。")
 
 def handle_merge_conflict():
     """处理合并冲突"""
-    print("合并冲突，请选择冲突解决策略：")
-    print("1. 强制远程覆盖本地 (输入 '1ycfgbendi')")
-    print("2. 强制本地覆盖远程 (输入 '2bendifgyc')")
-    print("3. 手动处理冲突 (输入 '3')")
-    strategy = input("请输入正确的操作代码：")
-    
-    if strategy == '1ycfgbendi':
-        confirmation = input("确定要强制远程覆盖本地吗？这将丢失本地所有未推送的更改 (请输入 'YES' 确认): ").upper()
-        if confirmation == 'YES':
+    print("处理合并冲突...")
+    strategy = input("合并冲突，请选择冲突解决策略：1. 强制远程覆盖本地 2. 强制本地覆盖远程 3. 手动解决冲突 (1/2/3): ")
+    if strategy == '1':
+        confirmation = input("确定要强制远程覆盖本地吗？这将丢失本地所有未推送的更改 (Y/N): ").upper()
+        if confirmation == 'Y':
             force_remote_overwrite()
         else:
             print("操作已取消。")
-    elif strategy == '2bendifgyc':
-        confirmation = input("确定要强制本地覆盖远程吗？这将丢失远程仓库中的所有更改 (请输入 'YES' 确认): ").upper()
-        if confirmation == 'YES':
+    elif strategy == '2':
+        confirmation = input("确定要强制本地覆盖远程吗？这将丢失远程仓库中的所有更改 (Y/N): ").upper()
+        if confirmation == 'Y':
             force_local_overwrite()
         else:
             print("操作已取消。")
