@@ -11,7 +11,7 @@ def choose_directory():
         os.path.dirname(os.path.dirname(os.path.dirname(current_path)))
     ]
     for i, path in enumerate(options):
-        print(f"{chr(65+i)}) {os.path.basename(path)} - {path}")
+        print(f"{chr(65+i)}) {os.path.basename(path)}")
     choice = input("请选择仓库目录 (A-D) 或 N 退出: ").upper()
     if choice == 'N':
         print("程序已退出。")
@@ -27,10 +27,7 @@ def run_hugo_server():
     """运行 hugo server"""
     print("正在启动 hugo server...")
     server_process = subprocess.Popen(["hugo", "server"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = server_process.communicate()
-    print("Hugo Server 输出:", stdout.decode())
-    if stderr:
-        print("错误信息:", stderr.decode())
+
     try:
         input("Hugo server 已启动。按 Enter 停止并继续...")
     finally:
@@ -43,11 +40,7 @@ def ask_to_publish_site():
     choice = input("是否发布网站 (执行 'hugo')? (Y/N): ").upper()
     if choice == 'Y':
         print("正在发布网站...")
-        publish_process = subprocess.Popen(["hugo"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = publish_process.communicate()
-        print("发布输出:", stdout.decode())
-        if stderr:
-            print("错误信息:", stderr.decode())
+        os.system("hugo")
         print("网站发布完成。")
     elif choice == 'N':
         print("程序已终止。")

@@ -2,36 +2,57 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Categories on 开亮人生</title>
-    <link>https://www.kailiang.life/categories/</link>
+    <link>http://localhost:1313/categories/</link>
     <description>Recent content in Categories on 开亮人生</description>
     <image>
       <title>开亮人生</title>
-      <url>https://www.kailiang.life/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>https://www.kailiang.life/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- 0.129.0</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 09 Oct 2023 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://www.kailiang.life/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 15 Aug 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>人生发展咨询师</title>
-      <link>https://www.kailiang.life/categories/%E4%BA%BA%E7%94%9F%E5%8F%91%E5%B1%95%E5%92%A8%E8%AF%A2%E5%B8%88/</link>
-      <pubDate>Sun, 01 Jan 2023 00:00:00 +0000</pubDate>
-      <guid>https://www.kailiang.life/categories/%E4%BA%BA%E7%94%9F%E5%8F%91%E5%B1%95%E5%92%A8%E8%AF%A2%E5%B8%88/</guid>
+      <title>城市漫步者</title>
+      <link>http://localhost:1313/categories/%E5%9F%8E%E5%B8%82%E6%BC%AB%E6%AD%A5%E8%80%85/</link>
+      <pubDate>Thu, 15 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/%E5%9F%8E%E5%B8%82%E6%BC%AB%E6%AD%A5%E8%80%85/</guid>
       <description></description>
     </item>
     <item>
       <title>松弛生活家</title>
-      <link>https://www.kailiang.life/categories/%E6%9D%BE%E5%BC%9B%E7%94%9F%E6%B4%BB%E5%AE%B6/</link>
-      <pubDate>Sun, 01 Jan 2023 00:00:00 +0000</pubDate>
-      <guid>https://www.kailiang.life/categories/%E6%9D%BE%E5%BC%9B%E7%94%9F%E6%B4%BB%E5%AE%B6/</guid>
+      <link>http://localhost:1313/categories/%E6%9D%BE%E5%BC%9B%E7%94%9F%E6%B4%BB%E5%AE%B6/</link>
+      <pubDate>Thu, 15 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/%E6%9D%BE%E5%BC%9B%E7%94%9F%E6%B4%BB%E5%AE%B6/</guid>
       <description></description>
     </item>
     <item>
       <title>社会观察者</title>
-      <link>https://www.kailiang.life/categories/%E7%A4%BE%E4%BC%9A%E8%A7%82%E5%AF%9F%E8%80%85/</link>
-      <pubDate>Tue, 30 Jun 2020 00:00:00 +0000</pubDate>
-      <guid>https://www.kailiang.life/categories/%E7%A4%BE%E4%BC%9A%E8%A7%82%E5%AF%9F%E8%80%85/</guid>
+      <link>http://localhost:1313/categories/%E7%A4%BE%E4%BC%9A%E8%A7%82%E5%AF%9F%E8%80%85/</link>
+      <pubDate>Thu, 15 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/%E7%A4%BE%E4%BC%9A%E8%A7%82%E5%AF%9F%E8%80%85/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>人生发展咨询师</title>
+      <link>http://localhost:1313/categories/%E4%BA%BA%E7%94%9F%E5%8F%91%E5%B1%95%E5%92%A8%E8%AF%A2%E5%B8%88/</link>
+      <pubDate>Mon, 13 May 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/%E4%BA%BA%E7%94%9F%E5%8F%91%E5%B1%95%E5%92%A8%E8%AF%A2%E5%B8%88/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>人生读者</title>
+      <link>http://localhost:1313/categories/%E4%BA%BA%E7%94%9F%E8%AF%BB%E8%80%85/</link>
+      <pubDate>Tue, 19 Mar 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/%E4%BA%BA%E7%94%9F%E8%AF%BB%E8%80%85/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>工具即思想</title>
+      <link>http://localhost:1313/categories/%E5%B7%A5%E5%85%B7%E5%8D%B3%E6%80%9D%E6%83%B3/</link>
+      <pubDate>Sun, 23 May 2021 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/%E5%B7%A5%E5%85%B7%E5%8D%B3%E6%80%9D%E6%83%B3/</guid>
       <description></description>
     </item>
   </channel>
