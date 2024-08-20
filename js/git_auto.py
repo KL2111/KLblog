@@ -136,6 +136,7 @@ def handle_merge_conflict():
     print("合并冲突，请选择冲突解决策略：")
     print("1. 强制远程覆盖本地 (输入 '1ycfgbendi')")
     print("2. 强制本地覆盖远程 (输入 '2bendifgyc')")
+    print("3. 手动处理冲突 (输入 '3')")
     strategy = input("请输入正确的操作代码：")
     
     if strategy == '1ycfgbendi':
@@ -150,6 +151,12 @@ def handle_merge_conflict():
             force_local_overwrite()
         else:
             print("操作已取消。")
+    elif strategy == '3':
+        print("请手动解决所有冲突并继续操作。")
+        print("解决所有冲突后，运行以下命令完成rebase并推送：")
+        print("git add <conflicted_files>")
+        print("git rebase --continue")
+        print("git push origin master")
     else:
         print("无效选择，退出程序。")
 
