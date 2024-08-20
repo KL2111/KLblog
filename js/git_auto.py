@@ -133,25 +133,23 @@ def merge_and_push(repo_dir):
 
 def handle_merge_conflict():
     """处理合并冲突"""
-    strategy = input("合并冲突，请选择冲突解决策略：1. 强制远程覆盖本地 2. 强制本地覆盖远程 3. 手动解决冲突 (1/2/3): ")
-    if strategy == '1':
-        confirmation = input("确定要强制远程覆盖本地吗？这将丢失本地所有未推送的更改 (Y/N): ").upper()
-        if confirmation == 'Y':
+    print("合并冲突，请选择冲突解决策略：")
+    print("1. 强制远程覆盖本地 (输入 '1ycfgbendi')")
+    print("2. 强制本地覆盖远程 (输入 '2bendifgyc')")
+    strategy = input("请输入正确的操作代码：")
+    
+    if strategy == '1ycfgbendi':
+        confirmation = input("确定要强制远程覆盖本地吗？这将丢失本地所有未推送的更改 (请输入 'YES' 确认): ").upper()
+        if confirmation == 'YES':
             force_remote_overwrite()
         else:
             print("操作已取消。")
-    elif strategy == '2':
-        confirmation = input("确定要强制本地覆盖远程吗？这将丢失远程仓库中的所有更改 (Y/N): ").upper()
-        if confirmation == 'Y':
+    elif strategy == '2bendifgyc':
+        confirmation = input("确定要强制本地覆盖远程吗？这将丢失远程仓库中的所有更改 (请输入 'YES' 确认): ").upper()
+        if confirmation == 'YES':
             force_local_overwrite()
         else:
             print("操作已取消。")
-    elif strategy == '3':
-        print("请手动解决所有冲突并继续操作。")
-        print("解决所有冲突后，运行以下命令完成rebase并推送：")
-        print("git add <conflicted_files>")
-        print("git rebase --continue")
-        print("git push origin master")
     else:
         print("无效选择，退出程序。")
 
