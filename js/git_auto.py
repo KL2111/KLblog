@@ -155,6 +155,37 @@ def handle_merge_conflict():
     else:
         print("无效选择，退出程序。")
 
+def clean_git_lock(repo_dir):
+    """清理Git锁文件"""
+    lock_file = os.path.join(repo_dir, '.git', 'index.lock')
+    if os.path.exists(lock_file):
+        os.remove(lock_file)
+        print("Removed stale index.lock file.")
+
+def check_for_git_processes():
+    """检查是否有其他Git进程在运行"""
+    result = subprocess.run("ps aux | grep '[g]it'", shell=True, capture_output=True, text=True)
+    if result.stdout.strip():
+        print("Detected another Git process running. Please wait for it to complete or terminate it before proceeding.")
+        exit(0)
+
+def handle_unfinished_rebase(repo_dir):
+    """处理未完成的rebase操作"""
+    rebase_dir = os.path.join(repo_dir, '.git', 'rebase-merge')
+    if os.path.exists(rebase_dir):
+        user_choice = input("检测到未完成的rebase操作，是否中止操作？ (Y/N): ").upper()
+        if user_choice == 'Y':
+            subprocess.run("git rebase --abort", shell=True)
+            print("未完成的rebase操作已中止。")
+        else:
+            print("请手动完成rebase操作后再运行此脚本。")
+            exit(1)
+
+def stash_local_changes():
+    """暂存本地更改"""
+    subprocess.run("git stash", shell=True)
+    print("Stashed local changes.")
+
 def main():
     config = load_config()
     if config:
@@ -170,8 +201,12 @@ def main():
     else:
         repo_dir = config['repo_dir']
         remote_url = config['remote_url']
-    
+
     verify_ssh()
+    clean_git_lock(repo_dir)
+    # check_for_git_processes()  # 如果确认没有其他 Git 进程，可以暂时注释掉这行
+    handle_unfinished_rebase(repo_dir)
+    stash_local_changes()
     ensure_git_repo(repo_dir)
     update_remote_repo(repo_dir, remote_url)
     
