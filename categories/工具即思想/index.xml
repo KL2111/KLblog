@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>工具即思想 on 开亮人生</title>
-    <link>http://localhost:1313/categories/%E5%B7%A5%E5%85%B7%E5%8D%B3%E6%80%9D%E6%83%B3/</link>
+    <link>https://www.kailiang.life/categories/%E5%B7%A5%E5%85%B7%E5%8D%B3%E6%80%9D%E6%83%B3/</link>
     <description>Recent content in 工具即思想 on 开亮人生</description>
     <image>
       <title>开亮人生</title>
-      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <url>https://www.kailiang.life/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://www.kailiang.life/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- 0.129.0</generator>
     <language>en</language>
     <lastBuildDate>Mon, 06 Mar 2023 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/categories/%E5%B7%A5%E5%85%B7%E5%8D%B3%E6%80%9D%E6%83%B3/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://www.kailiang.life/categories/%E5%B7%A5%E5%85%B7%E5%8D%B3%E6%80%9D%E6%83%B3/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>爬取并分析薪酬数据及分析地案例</title>
-      <link>http://localhost:1313/2021-05-23_data-crawling-analysis/</link>
+      <link>https://www.kailiang.life/2021-05-23_data-crawling-analysis/</link>
       <pubDate>Sun, 23 May 2021 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/2021-05-23_data-crawling-analysis/</guid>
+      <guid>https://www.kailiang.life/2021-05-23_data-crawling-analysis/</guid>
       <description> 运营是不是比产品收入低？
 这只是一种感觉，一种定性的描述——所谓运营是在互联网歧视链的下端，事实怎么样，必须要数据定量的方式来回答。
 过程 拉勾爬取对应岗位的薪资范围，包括产品、运营、产品总监、运营总监。使用Chrome插件“Instant Data Scraper”（比WebScraper 傻瓜，但无法翻页，需要多次手动） 对于薪资数据基于产品和运营、产品总监和运营总监，对其薪资范围的低值和高值，进行箱图分析——包括中位数（平均水平）、波动范围（上四分位数和下四分位数的箱体大小）、最大和最小值、异常值。 整体产品和运营的薪资箱图分析—— 高阶（总监）产品和高阶运营的薪资箱图分析—— 结论 不管是从整体还是高阶（总监），产品薪资均高于运营； 高阶产品和运营的差距在缩小，到了高阶彼此的差异在缩小。 整体上产品薪资波动，不管是从薪资范围的低值还是高值，波动范围均高于运营。一个可能的原因是产品更符合求职者的想象，部分公司以产品这个框，希望更易招人，类似早年的“管培生”。 薪资上线的波动相对更大，与实际求职中，用人单位的薪资开方谈的招聘策略有关。 思考 数据的价值与意义，在于准确描述现象，比如运营的薪资状态准确找到联系，而不是定性、模糊的。量化是一种重要的思维习惯。这一块需要继续训练，特别是“工具即思维”，比如箱图这个工具。 使用的Chrome插件“Instant Data Scraper”，比“WebScraper”傻瓜，但无法翻页，需要多次手动。在日常快速抓取一些列表数据的时候，很推荐。 ChangeLog 2021-05-23 </description>
