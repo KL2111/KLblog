@@ -18,10 +18,6 @@ def save_config(config):
     with open(config_path, 'w', encoding='utf-8') as f:
         json.dump(config, f, ensure_ascii=False)
 
-def is_git_repository(repo_dir):
-    """检查当前目录是否是一个Git仓库"""
-    return os.path.exists(os.path.join(repo_dir, '.git'))
-
 def choose_directory():
     """选择Git仓库目录"""
     current_path = os.path.dirname(os.path.realpath(__file__))
@@ -78,10 +74,14 @@ def check_local_changes():
     status_result = subprocess.run("git status --porcelain", shell=True, capture_output=True, text=True)
     return status_result.stdout.strip() != ""
 
+def is_git_repository(repo_dir):
+    """检查是否是Git仓库"""
+    return os.path.exists(os.path.join(repo_dir, '.git'))
+
 def ensure_git_repo(repo_dir):
     """确保当前目录是一个 Git 仓库"""
     os.chdir(repo_dir)
-    if not is_git_repository(repo_dir):
+    if not os.path.exists(os.path.join(repo_dir, '.git')):
         print("当前目录不是一个 Git 仓库，正在初始化...")
         subprocess.run("git init", shell=True)
         subprocess.run("touch README.md", shell=True)
@@ -91,18 +91,74 @@ def ensure_git_repo(repo_dir):
     else:
         print("当前目录已经是一个 Git 仓库。")
 
-def force_remote_overwrite():
-    """强制远程覆盖本地"""
-    subprocess.run("git fetch origin", shell=True)
-    subprocess.run("git reset --hard origin/master", shell=True)
-    print("远程仓库已覆盖本地仓库。")
+def handle_unfinished_rebase(repo_dir):
+    """处理未完成的rebase操作"""
+    if not is_git_repository(repo_dir):
+        print("当前目录不是一个Git仓库，无法处理rebase操作。")
+        exit(1)
+    
+    os.chdir(repo_dir)  # 确保切换到Git仓库目录
+    
+    rebase_dir = os.path.join(repo_dir, '.git', 'rebase-merge')
+    if os.path.exists(rebase_dir):
+        user_choice = input("检测到未完成的rebase操作。是否继续？(Y) 还是中止？(N) 还是放弃rebase并重新开始？(A): ").upper()
+        if user_choice == 'Y':
+            result = subprocess.run("git rebase --continue", shell=True, text=True, capture_output=True)
+            if result.returncode != 0:
+                print("尝试继续rebase操作时出错。")
+                if result.stderr and "You must edit all merge conflicts" in result.stderr:
+                    print("检测到冲突，仍然需要手动解决并添加已解决的文件。")
+                else:
+                    print(f"错误信息: {result.stderr}")
+                exit(1)
+            print("尝试继续rebase操作。")
+            if os.path.exists(rebase_dir):
+                print("rebase未完成，可能需要手动解决冲突。")
+                exit(1)
+            else:
+                print("rebase操作已成功完成。")
+        elif user_choice == 'N':
+            subprocess.run("git rebase --abort", shell=True)
+            print("未完成的rebase操作已中止。")
+        elif user_choice == 'A':
+            print("放弃当前的rebase操作，重新开始Git操作。")
+            subprocess.run("git rebase --abort", shell=True)
+            clean_git_lock(repo_dir)
+            pull_and_update(repo_dir)
+        else:
+            print("无效选择。")
+            exit(1)
 
-def force_local_overwrite():
-    """强制本地覆盖远程"""
-    if check_local_changes():
-        commit_local_changes()
-    subprocess.run("git push origin master --force", shell=True)
-    print("本地仓库已覆盖远程仓库。")
+def clean_git_lock(repo_dir):
+    """清理遗留的git锁文件"""
+    lock_file = os.path.join(repo_dir, '.git', 'index.lock')
+    if os.path.exists(lock_file):
+        print("检测到遗留的Git锁文件，正在清理...")
+        os.remove(lock_file)
+
+def check_for_git_processes():
+    """检查是否有其他Git进程在运行"""
+    result = subprocess.run("ps aux | grep '[g]it ' | grep -v 'Clash Verge' | grep -v 'WeChat' | grep -v 'Python'", shell=True, capture_output=True, text=True)
+    if result.stdout.strip():
+        print("Detected the following Git-related processes:")
+        print(result.stdout)
+        choice = input("这些进程已被检测到。你要忽略并继续吗？(Y/N): ").upper()
+        if choice == 'Y':
+            print("继续脚本执行...")
+        else:
+            print("请终止这些进程后再继续。")
+            exit(0)
+
+def pull_and_update(repo_dir):
+    """拉取最新更新并处理合并策略"""
+    os.chdir(repo_dir)
+    print(f"Pulling latest changes from origin")
+    pull_result = subprocess.run("git pull origin master --allow-unrelated-histories", shell=True, text=True, capture_output=True)
+    if pull_result.returncode != 0:
+        print(f"拉取失败，错误信息: {pull_result.stderr}")
+        handle_unfinished_rebase(repo_dir)
+    else:
+        print("Git操作完成。")
 
 def merge_and_push(repo_dir):
     """合并并推送"""
@@ -111,107 +167,18 @@ def merge_and_push(repo_dir):
     pull_result = subprocess.run("git pull --rebase origin master", shell=True, text=True, capture_output=True)
     if pull_result.returncode != 0:
         print(f"拉取失败，错误信息: {pull_result.stderr}")
-        handle_merge_conflict()
+        handle_unfinished_rebase(repo_dir)
         return
-    # 获取用户的commit信息或使用默认日期作为commit信息
-    commit_message = input("请输入commit信息（日期信息已默认输入）: ")
-    if not commit_message:
-        commit_message = datetime.datetime.now().strftime("%Y%m%d")
-    else:
-        commit_message = datetime.datetime.now().strftime("%Y%m%d_") + commit_message
-    # 添加所有更改到staging area
-    subprocess.run("git add -A", shell=True)
-    # 执行commit，如果没有变化则不会创建新的commit
-    commit_result = subprocess.run(f"git commit -m '{commit_message}'", shell=True, text=True, capture_output=True)
-    if "nothing to commit" in commit_result.stdout or "nothing to commit" in commit_result.stderr:
-        print("没有发现需要提交的更改。")
-    else:
-        print("Committing changes")
-    # 推送更改到远程仓库
+    
+    commit_message = f"Commit after merging on {datetime.datetime.now().strftime('%Y%m%d')}"
+    subprocess.run(f"git commit -m '{commit_message}'", shell=True, capture_output=True, text=True)
+    
     push_result = subprocess.run("git push origin master", shell=True, text=True, capture_output=True)
     if push_result.returncode != 0:
         print(f"推送失败，错误信息: {push_result.stderr}")
-        handle_merge_conflict()
+        handle_unfinished_rebase(repo_dir)
     else:
         print("Git操作完成。")
-
-def handle_merge_conflict():
-    """处理合并冲突"""
-    strategy = input("合并冲突，请选择冲突解决策略：1. 强制远程覆盖本地 2. 强制本地覆盖远程 3. 手动解决冲突 (1/2/3): ")
-    if strategy == '1':
-        confirmation = input("确定要强制远程覆盖本地吗？这将丢失本地所有未推送的更改 (Y/N): ").upper()
-        if confirmation == 'Y':
-            force_remote_overwrite()
-        else:
-            print("操作已取消。")
-    elif strategy == '2':
-        confirmation = input("确定要强制本地覆盖远程吗？这将丢失远程仓库中的所有更改 (Y/N): ").upper()
-        if confirmation == 'Y':
-            force_local_overwrite()
-        else:
-            print("操作已取消。")
-    elif strategy == '3':
-        print("请手动解决所有冲突并继续操作。")
-        print("解决所有冲突后，运行以下命令完成rebase并推送：")
-        print("git add <conflicted_files>")
-        print("git rebase --continue")
-        print("git push origin master")
-    else:
-        print("无效选择，退出程序。")
-
-def clean_git_lock(repo_dir):
-    """清理Git锁文件"""
-    lock_file = os.path.join(repo_dir, '.git', 'index.lock')
-    if os.path.exists(lock_file):
-        os.remove(lock_file)
-        print("Removed stale index.lock file.")
-
-def check_for_git_processes():
-    """检查是否有其他Git进程在运行"""
-    result = subprocess.run("ps aux | grep '[g]it ' | grep -v 'Clash Verge' | grep -v 'WeChat' | grep -v 'Python'", shell=True, capture_output=True, text=True)
-    if result.stdout.strip():
-        print("Detected the following Git-related processes:")
-        print(result.stdout)
-        choice = input("These processes were detected. Do you want to ignore and continue? (Y/N): ").upper()
-        if choice == 'Y':
-            print("Continuing script execution...")
-        else:
-            print("Please terminate these processes before proceeding.")
-            exit(0)
-
-def handle_unfinished_rebase(repo_dir):
-    """处理未完成的rebase操作"""
-    if not is_git_repository(repo_dir):
-        print("当前目录不是一个Git仓库，无法处理rebase操作。")
-        exit(1)
-    
-    os.chdir(repo_dir)  # 切换到Git仓库目录
-    print(f"当前目录: {os.getcwd()}")  # 打印当前目录，确保切换成功
-    
-    rebase_dir = os.path.join(repo_dir, '.git', 'rebase-merge')
-    if os.path.exists(rebase_dir):
-        user_choice = input("检测到未完成的rebase操作。是否尝试继续？(Y) 还是中止？(N): ").upper()
-        if user_choice == 'Y':
-            subprocess.run("git rebase --continue", shell=True)
-            print("尝试继续rebase操作。")
-            if os.path.exists(rebase_dir):
-                print("rebase未完成，可能需要手动解决冲突。")
-                exit(1)
-            else:
-                print("rebase操作已成功完成。")
-        else:
-            subprocess.run("git rebase --abort", shell=True)
-            print("未完成的rebase操作已中止。")
-
-
-def stash_local_changes():
-    """暂存本地更改"""
-    if not is_git_repository(os.getcwd()):
-        print("当前目录不是一个Git仓库，无法暂存更改。")
-        exit(1)
-
-    subprocess.run("git stash", shell=True)
-    print("Stashed local changes.")
 
 def main():
     config = load_config()
@@ -228,13 +195,10 @@ def main():
     else:
         repo_dir = config['repo_dir']
         remote_url = config['remote_url']
-
+    
     verify_ssh()
-    clean_git_lock(repo_dir)
-    check_for_git_processes()
-    handle_unfinished_rebase(repo_dir)
-    stash_local_changes()
     ensure_git_repo(repo_dir)
+    handle_unfinished_rebase(repo_dir)
     update_remote_repo(repo_dir, remote_url)
     
     if check_local_changes():
