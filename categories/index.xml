@@ -11,8 +11,15 @@
     </image>
     <generator>Hugo -- 0.129.0</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 15 Aug 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 01 Sep 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://www.kailiang.life/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>人生发展咨询师</title>
+      <link>https://www.kailiang.life/categories/%E4%BA%BA%E7%94%9F%E5%8F%91%E5%B1%95%E5%92%A8%E8%AF%A2%E5%B8%88/</link>
+      <pubDate>Sun, 01 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://www.kailiang.life/categories/%E4%BA%BA%E7%94%9F%E5%8F%91%E5%B1%95%E5%92%A8%E8%AF%A2%E5%B8%88/</guid>
+      <description></description>
+    </item>
     <item>
       <title>城市漫步者</title>
       <link>https://www.kailiang.life/categories/%E5%9F%8E%E5%B8%82%E6%BC%AB%E6%AD%A5%E8%80%85/</link>
@@ -35,13 +42,6 @@
       <description></description>
     </item>
     <item>
-      <title>人生发展咨询师</title>
-      <link>https://www.kailiang.life/categories/%E4%BA%BA%E7%94%9F%E5%8F%91%E5%B1%95%E5%92%A8%E8%AF%A2%E5%B8%88/</link>
-      <pubDate>Mon, 13 May 2024 00:00:00 +0000</pubDate>
-      <guid>https://www.kailiang.life/categories/%E4%BA%BA%E7%94%9F%E5%8F%91%E5%B1%95%E5%92%A8%E8%AF%A2%E5%B8%88/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>人生读者</title>
       <link>https://www.kailiang.life/categories/%E4%BA%BA%E7%94%9F%E8%AF%BB%E8%80%85/</link>
       <pubDate>Tue, 19 Mar 2024 00:00:00 +0000</pubDate>
@@ -51,7 +51,7 @@
     <item>
       <title>工具即思想</title>
       <link>https://www.kailiang.life/categories/%E5%B7%A5%E5%85%B7%E5%8D%B3%E6%80%9D%E6%83%B3/</link>
-      <pubDate>Sun, 23 May 2021 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
       <guid>https://www.kailiang.life/categories/%E5%B7%A5%E5%85%B7%E5%8D%B3%E6%80%9D%E6%83%B3/</guid>
       <description></description>
     </item>
